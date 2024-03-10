@@ -1,0 +1,190 @@
+---
+title: "Shiny Birdpop App Scratch"
+author: "Steven Mitchell"
+format: 
+  html:
+    toc: true
+    embed-resources: true
+theme: journal
+editor: visual
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+# Objectives & Pseudocode
+- Plot exploring correlations between morphometric measurements. Y-axis will be weight. Categorical predictor variables can be selected from widget (age, flight feather wear, etc). 
+  - Wrangle data into form that will allow easy plotting
+  - Set up inputs/outputs
+  - Make a global ggplot theme
+  
+- Plot of counts of adult birds over time with filter-by-species widget and slider bar to select timeframe displayed
+  - Wrangle data into yearly time series tsibble
+  - Summarize counts by species
+  - Set up species filter input/output
+  
+- Plot displaying species richness by site with filter function.
+  - Wrangle data into form allowing easy plotting
+  - Summarize by species counts per site per year
+  
+- Bonus: abundance estimates per species using mark-recapture functions in 'recapr'
+
+### Loadpackages
+```{r}
+library(tidyverse)
+library(here)
+library(tsibble)
+library(janitor)
+library(sf)
+library(tmap)
+library(leaflet)
+```
+
+### load data
+```{r}
+maps_banding <- read_csv(here('data','wa_maps_banding.csv')) %>% 
+  clean_names()
+
+
+
+banded <- maps_banding %>% 
+  drop_na(band)
+length(unique(banded$station))
+```
+
+## Widget 1: Map of Sites
+### Load data
+```{r}
+## Explore spatial data
+### Wrangle
+stations <- read_sf(here('data', 'wa_maps_stations.csv')) %>% 
+  clean_names() %>% 
+  select(station, name, declat, declng, elev, habitat) %>% 
+  rename(lat = declat, long = declng) %>% 
+  mutate(lat = as.numeric(lat), 
+         long = as.numeric(long),
+         elev = as.numeric(elev))
+
+species_richness <- read_csv(here('data','wa_maps_banding.csv')) %>% 
+  dplyr::select(spec, date, station) %>% 
+  drop_na() %>% 
+  group_by(station) %>%
+  summarize(species_count = n_distinct(spec))
+
+stations <- left_join(stations, species_richness, by = 'station')
+
+center_lng <- median(stations$long)
+center_lat <- median(stations$lat)
+
+
+leaflet(data = stations) %>%
+  addTiles() %>%
+  addMarkers(~long, ~lat, popup = ~name) %>% 
+  setView(lng = center_lng, lat = center_lat, zoom = 6.5)
+```
+
+## Widget 2: Boxplots of weight x morphometrics
+Plot exploring correlations between morphometric measurements. Y-axis will be weight. Categorical predictor variables can be selected from widget (age, flight feather wear, etc). 
+  - Wrangle data into form that will allow easy plotting
+  - Set up inputs/outputs
+  - Make a global ggplot theme
+### Data wrangle
+```{r}
+morphometrics <- maps_banding %>% 
+  select(spec, age, sex, f, fw, wng, weight, brstat) %>% 
+  filter(weight != 0, wng != 0, age != 0, brstat != '?') %>%
+  mutate(age = ifelse(age == 4, "Nestling",
+               ifelse(age == 2, "1st year",
+               ifelse(age == 1, ">1st year",
+               ifelse(age == 5, "2nd year",
+               ifelse(age == 6, ">2nd year", NA)))))) %>% 
+  mutate(age = as.factor(age)) %>%   
+  mutate(brstat = ifelse(brstat == 'B', "Breeder",
+                  ifelse(brstat == 'U', "Usual breeder",
+                  ifelse(brstat == 'O', "Occasional breeder",
+                  ifelse(brstat == 'T', "Transient",
+                  ifelse(brstat == 'A', "Altitudinal disperser", 
+                  ifelse(brstat == 'M', 'Migrant', NA))))))) %>% 
+  mutate(brstat = as.factor(brstat)) %>% 
+  mutate(spec = as.factor(spec)) %>%
+  mutate(f = as.factor(f)) %>% 
+  drop_na()
+
+unique(morphometrics$spec)
+```
+### Exploratory plots
+```{r}
+weight_x_wng_plot <- ggplot(morphometrics, aes(x = wng, y = weight, color = spec)) +
+  geom_point() +
+  theme_bw() +
+  theme(legend.position = "none") +
+  labs(x = 'Wing chord (length in mm)', y = 'Body weight (g)')
+
+weight_x_age_plot <- ggplot(morphometrics, aes(x = age, y = weight)) +
+  geom_boxplot() +
+  scale_y_log10() +
+  theme_bw() +
+  theme(legend.position = "none") +
+  labs(x = 'Age class', y = 'Body weight (log10 g)')
+
+fat_x_weight_plot <- ggplot(morphometrics, aes(x = f, y = weight)) +
+  geom_boxplot() +
+  scale_y_log10() +
+  theme_bw() +
+  labs(x = 'Fat', y = 'Body weight (log10 g)')
+
+sex_x_weight_plot <- ggplot(morphometrics, aes(x = sex, y = weight)) +
+  geom_boxplot() +
+  scale_y_log10() +
+  theme_bw() +
+  labs(x = 'Sex', y = 'Body weight (log10 g)')
+
+bs_x_weight_plot <- ggplot(morphometrics, aes(x = brstat, y = weight)) +
+  geom_boxplot() +
+  scale_y_log10() +
+  theme_bw() +
+  labs(x = 'Breeding Status', y = 'Body weight (log10 g)')
+
+```
+
+## Widget 2:
+- Plot of counts of adult birds over time with filter-by-species widget and slider bar to select timeframe displayed
+  - Wrangle data into yearly time series tsibble
+  - Summarize counts by species
+  - Set up species filter input/output
+### Data Wranlge
+```{r}
+counts_ts <- maps_banding %>% 
+  select(spec, date, station) %>% 
+  drop_na() %>% 
+  group_by(spec, date) %>%
+  count()
+```
+### Exploratory Plot
+```{r}
+ggplot(counts_ts, aes(x = year(date), y = n, color = spec)) +
+  geom_col() + 
+  theme(legend.position = 'none')+
+  labs(y = 'Number of Captures', x = 'Year')
+```
+## Widget 3:
+- Plot displaying species richness by site with filter function.
+  - Wrangle data into form allowing easy plotting
+  - Summarize by species counts per site per year
+### Data Wrangle
+```{r}
+species_richness <- maps_banding %>% 
+  select(spec, date, station) %>% 
+  drop_na() %>% 
+  group_by(station) %>%
+  summarize(species_count = n_distinct(spec))
+```
+### Exploratory Plot
+```{r}
+ggplot(species_richness, aes(x = station, y = species_count))+
+  geom_col() +
+  theme(legend.position = 'none',
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+
