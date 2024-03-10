@@ -1,0 +1,39 @@
+@import url("https://fonts.googleapis.com/css2?family=Karma&family=Prompt:wght@200&display=swap");
+body {
+  background-color: #8ca376;
+  color: black;
+}
+
+h1 {
+  color: black;
+  letter-spacing: 5px;
+  font-family: "Karma", serif;
+}
+
+h2 {
+  color: black;
+  letter-spacing: 5px;
+  font-family: "Karma", serif;
+}
+
+h4 {
+  color: black;
+  font-family: "Karma", serif;
+}
+
+p {
+  color: black;
+  font-family: "Prompt", sans-serif;
+}
+
+a {
+  color: #0000ab;
+}
+
+.navbar-default {
+  background-color: #fff2d2;
+}
+
+.btn.default.active {
+  background-color: #8ca376;
+}

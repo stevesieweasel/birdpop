@@ -45,8 +45,8 @@ library(leaflet)
 maps_banding <- read_csv(here('data','wa_maps_banding.csv')) %>% 
   clean_names()
 
-
-
+effort <- read_csv(here('data', 'wa_maps_nethrs.csv'))
+unique(effort$STATION)
 banded <- maps_banding %>% 
   drop_na(band)
 length(unique(banded$station))
