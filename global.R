@@ -47,19 +47,18 @@ morphometrics <- read_csv(here('data','wa_maps_banding.csv')) %>%
   select(spec, age, sex, f, fw, wng, weight, brstat) %>% 
   filter(weight != 0, wng != 0, age != 0, brstat != '?') %>%
   mutate(age = ifelse(age == 4, "Nestling",
-                      ifelse(age == 2, "1st year",
-                             ifelse(age == 1, ">1st year",
-                                    ifelse(age == 5, "2nd year",
-                                           ifelse(age == 6, ">2nd year", NA)))))) %>% 
+               ifelse(age == 2, "1st year",
+               ifelse(age == 1, ">1st year",
+               ifelse(age == 5, "2nd year",
+              ifelse(age == 6, ">2nd year", NA)))))) %>% 
   mutate(age = as.factor(age)) %>%   
   mutate(brstat = ifelse(brstat == 'B', "Breeder",
-                         ifelse(brstat == 'U', "Usual breeder",
-                                ifelse(brstat == 'O', "Occasional breeder",
-                                       ifelse(brstat == 'T', "Transient",
-                                              ifelse(brstat == 'A', "Altitudinal disperser", 
-                                                     ifelse(brstat == 'M', 'Migrant', NA))))))) %>% 
+                  ifelse(brstat == 'U', "Usual breeder",
+                  ifelse(brstat == 'O', "Occasional breeder",
+                  ifelse(brstat == 'T', "Transient",
+                  ifelse(brstat == 'A', "Altitudinal disperser", 
+                  ifelse(brstat == 'M', 'Migrant', NA))))))) %>% 
   mutate(brstat = as.factor(brstat)) %>% 
-  mutate(spec = as.factor(spec)) %>%
   mutate(f = as.factor(f)) %>% 
   rename('Fat_Content' = 'f', 
          'Breeding_Status' = 'brstat',
@@ -68,7 +67,16 @@ morphometrics <- read_csv(here('data','wa_maps_banding.csv')) %>%
   drop_na()
 
 ## Reorder the levels of the Age and Breeding_Status factors
-morphometrics$Age <- factor(morphometrics$Age, levels = c("Nestling", "1st year", ">1st year", "2nd year", ">2nd year"))
+morphometrics$Age <- factor(morphometrics$Age, levels = c("Nestling", 
+                                                          "1st year", 
+                                                          ">1st year", 
+                                                          "2nd year", 
+                                                          ">2nd year"))
 morphometrics$Breeding_Status <- factor(morphometrics$Breeding_Status, 
-                                        levels = c("Breeder","Usual breeder","Occasional breeder","Altitudinal disperser",'Migrant',"Transient"))
+                                        levels = c("Breeder",
+                                                   "Usual breeder",
+                                                   "Occasional breeder",
+                                                   "Altitudinal disperser",
+                                                   'Migrant',
+                                                   "Transient"))
 

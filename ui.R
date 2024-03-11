@@ -100,39 +100,50 @@ ui <- navbarPage(
              
              # morphometrics tabPanel ----
              tabPanel(title = "Morphometrics",
+
+                      tags$img(src = "wing_chord.jpg", width = 200, height = 150),  
+                      tags$img(src = "rbnu.jpg", width = 300, height = 150), 
+                      tags$img(src = "olfl.jpg", width = 300, height = 150),
+                      tags$img(src = "band_sizing.jpg", width = 300, height = 150),
                       
+                      tags$div(style = "margin-top: 20px;"), # add some space
+
                       # morphometrics sidebarLayout ----
                       sidebarLayout(
                         
-                        # trout sidebarPanel ----
+                        # morphometric sidebarPanel ----
                         sidebarPanel(
                           
-                          # channel type pickerInput ----
+                          # measurement type pickerInput ----
                           radioButtons(inputId = "measurement_input", 
                                       label = "Select measurement type:",
                                       choices = c('Age', 'Sex', 'Breeding_Status', 'Fat_Content'),
                                       selected = 'Age'), 
                           # END morphometirc measurement type pickerInput
                           
-                          # section checkboxGroupInput ----
+                          # START species pickerInput ----
                           pickerInput(inputId = 'species_input',
                                       label = "Select species of interest:",
                                       choices = c(unique(morphometrics$spec)),
-                                      selected = "AMDI",
+                                      selected = c("SWTH","AMRO"),
                                       options = pickerOptions(actionsBox = TRUE),
                                       multiple = TRUE),
 
-                          # END section checkboxGroupInput
+
                           
-                        ), # END trout sidebarPanel
+                          # END species pickerInput ----
+                          
+                        ), # END morphometric sidebarPanel
                         
-                        # trout mainPanel ----
+                        # morphometric mainPanel ----
                         mainPanel(
                           
                           includeMarkdown("text/morphometrics_page.md"),
                           
                           plotOutput(outputId = "morphometric_plot") %>% 
                             withSpinner(color = "#006792", type = 1),
+                          
+                          tags$div(style = "margin-top: 20px;"), # add some space
                           
                           plotOutput(outputId = "wing_plot") %>% 
                             withSpinner(color = "#006792", type = 1)
