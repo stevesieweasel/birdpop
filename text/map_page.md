@@ -1,0 +1,1 @@
+In Washington State, 37 MAPS stations are operated consistently enough to make use of the data collected. 36 stations are presented here, because the 37th, Sunshine Point at Mount Rainier National Park, has concealed coordinates to protect the sensitive species present there.

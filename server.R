@@ -9,7 +9,14 @@ server <- function(input, output) {
     return(filtered_stations)
   })
 
-
+  # filter for species ----
+  morphometrics_filtered_df <- reactive({
+    morphometrics_filtered <- morphometrics %>% 
+      filter(spec == input$species_input)
+    
+    
+    return(morphometrics_filtered)
+  })
   
   # station map ----
   output$station_map_output <- renderLeaflet({
@@ -20,24 +27,34 @@ server <- function(input, output) {
   
   # species richness barchart ----
   output$spp_richness_bar_output <- renderPlot({
-    ggplot(data = stations_filtered_df(), aes(x = station, y = species_count))+
+    ggplot(data = stations_filtered_df(), aes(x = station, y = species_count)) +
       geom_col() +
       theme_bw() +
       theme(legend.position = 'none',
             axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
       labs(x = 'Banding Station', y = 'Species Richness',
-           title = 'Observed Species Richness by MAPS Station')})
-  
-  
+           title = 'Observed Species Richness at Each  MAPS Station')})
+
   # morphometric boxplots ----
   output$morphometric_plot <- renderPlot({
     
     selected_measurement <- input$measurement_input
     
-    ggplot(morphometrics, aes(x = !!sym(selected_measurement), y = weight)) +
+    ggplot(morphometrics_filtered_df(), aes(x = !!sym(selected_measurement), y = weight)) +
     geom_boxplot() +
     theme_bw() +
     labs(x = input$measurement_input, y = 'Body weight (log10 g)') })
+  
+  # wing length vs body weight scatterplot ----
+  output$wing_plot <- renderPlot({
+  
+  selected_species <- input$species_input
+  
+  ggplot(morphometrics_filtered_df(), aes(x = wng, y = weight, color = spec)) +
+    geom_point() +
+    theme_bw() +
+    theme(legend.position = "none") +
+    labs(x = 'Wing chord (length in mm)', y = 'Body weight (g)') })
   
   
   # cover photo ----

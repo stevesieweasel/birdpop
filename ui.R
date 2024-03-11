@@ -42,7 +42,7 @@ ui <- navbarPage(
   ), # END (Page 1) intro tabPanel
   
   # (Page 2) data viz tabPanel ----
-  tabPanel(title = "Station Locations",
+  tabPanel(title = "MAPS Stations",
 
 
                       # stations sidebarLayout ----
@@ -52,13 +52,15 @@ ui <- navbarPage(
                         sidebarPanel(
 
                           # stationspickerInput ----
-                          sliderInput(inputId = "elev_input", label = "Select a range of elevations",
+                          sliderInput(inputId = "elev_input", label = "Select a range of elevations (meters)",
                                       min = 3, max = 2100, value = c(3, 2100)), # END elevation pickerInput
 
                 ), # END station sidebarPanel
 
                         # station mainPanel ----
                         mainPanel(
+                          includeMarkdown("text/map_page.md"),
+                          
                           # START Map fluidRow
                           fluidRow(
                             # use columns to create white space on sides
@@ -106,34 +108,40 @@ ui <- navbarPage(
                         sidebarPanel(
                           
                           # channel type pickerInput ----
-                          pickerInput(inputId = "measurement_input", 
+                          radioButtons(inputId = "measurement_input", 
                                       label = "Select measurement type:",
                                       choices = c('Age', 'Sex', 'Breeding_Status', 'Fat_Content'),
-                                      selected = 'Age',
-                                      options = pickerOptions(actionsBox = TRUE),
-                                      multiple = FALSE), 
+                                      selected = 'Age'), 
                           # END morphometirc measurement type pickerInput
                           
                           # section checkboxGroupInput ----
-                          #checkboxGroupButtons(inputId = "section_input", label = "Select a sampling section(s):",
-                           #                    choices = c("clear cut forest", "old growth forest"),
-                            #                   selected = c("clear cut forest", "old growth forest"),
-                             #                  individual = FALSE, justified = TRUE, size = "sm",
-                              #                 checkIcon = list(yes = icon("ok", lib = "glyphicon"), no = icon("remove", lib = "glyphicon"))), # END section checkboxGroupInput
+                          pickerInput(inputId = 'species_input',
+                                      label = "Select species of interest:",
+                                      choices = c(unique(morphometrics$spec)),
+                                      selected = "AMDI",
+                                      options = pickerOptions(actionsBox = TRUE),
+                                      multiple = TRUE),
+
+                          # END section checkboxGroupInput
                           
                         ), # END trout sidebarPanel
                         
                         # trout mainPanel ----
                         mainPanel(
                           
-                          plotOutput(outputId = "morphometric_plot") |> 
+                          includeMarkdown("text/morphometrics_page.md"),
+                          
+                          plotOutput(outputId = "morphometric_plot") %>% 
+                            withSpinner(color = "#006792", type = 1),
+                          
+                          plotOutput(outputId = "wing_plot") %>% 
                             withSpinner(color = "#006792", type = 1)
                           
-                        ) # END trout mainPanel
+                        ) # END morph mainPanel
                         
-                      ) # END trout sidebarLayout
+                      ) # END morph sidebarLayout
                       
-             ), # END trout tabPanel
+             ), # END morph tabPanel
              
 
            

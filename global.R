@@ -16,18 +16,8 @@ library(fresh)
 library(shinycssloaders)
 library(sass)
 
-# GGPLOT THEME ----
-myCustomTheme <- function() {
-  theme_light() +
-    theme(axis.text = element_text(size = 12),
-          axis.title = element_text(size = 14, face = "bold"),
-          legend.title = element_text(size = 14, face = "bold"),
-          legend.text = element_text(size = 13),
-          legend.position = "bottom",
-          panel.border = element_rect(linewidth = 0.7))
-}
-
 # DATA WRANGLING ----
+## Station info ----
 stations <- read_sf(here('data', 'wa_maps_stations.csv')) %>% 
   clean_names() %>% 
   select(station, name, declat, declng, elev, habitat) %>% 
@@ -36,6 +26,7 @@ stations <- read_sf(here('data', 'wa_maps_stations.csv')) %>%
          long = as.numeric(long),
          elev = as.numeric(elev))
 
+## Species Richness calculations
 species_richness <- read_csv(here('data','wa_maps_banding.csv')) %>% 
   clean_names() %>% 
   select(spec, date, station) %>% 
@@ -43,13 +34,14 @@ species_richness <- read_csv(here('data','wa_maps_banding.csv')) %>%
   group_by(station) %>%
   summarize(species_count = n_distinct(spec))
 
+## Adding species richness column to station sf
 stations <- left_join(stations, species_richness, by = 'station')
 
-
+## Finding optimal location to center station map
 center_lng <- median(stations$long)
 center_lat <- median(stations$lat)
 
-
+# Wrangling raw banding data into tidy df of useful morphometrics
 morphometrics <- read_csv(here('data','wa_maps_banding.csv')) %>% 
   clean_names() %>% 
   select(spec, age, sex, f, fw, wng, weight, brstat) %>% 
@@ -75,28 +67,8 @@ morphometrics <- read_csv(here('data','wa_maps_banding.csv')) %>%
          'Age' = 'age') %>% 
   drop_na()
 
-# Reorder the levels of the Age factor
+## Reorder the levels of the Age and Breeding_Status factors
 morphometrics$Age <- factor(morphometrics$Age, levels = c("Nestling", "1st year", ">1st year", "2nd year", ">2nd year"))
 morphometrics$Breeding_Status <- factor(morphometrics$Breeding_Status, 
                                         levels = c("Breeder","Usual breeder","Occasional breeder","Altitudinal disperser",'Migrant',"Transient"))
-print(levels(morphometrics$Age))
-
-######## trout stuff to clear later
-clean_trout <- and_vertebrates |>
-  filter(species == "Cutthroat trout") |>
-  select(sampledate, section, species, length_mm = length_1_mm, weight_g, channel_type = unittype) |> 
-  mutate(channel_type = case_when(
-    channel_type == "C" ~ "cascade",
-    channel_type == "I" ~ "riffle",
-    channel_type =="IP" ~ "isolated pool",
-    channel_type =="P" ~ "pool",
-    channel_type =="R" ~ "rapid",
-    channel_type =="S" ~ "step (small falls)",
-    channel_type =="SC" ~ "side channel"
-  )) |> 
-  mutate(section = case_when(
-    section == "CC" ~ "clear cut forest",
-    section == "OG" ~ "old growth forest"
-  )) |> 
-  drop_na()
 
