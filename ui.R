@@ -90,7 +90,7 @@ ui <- navbarPage(
 
 
 
-  ), # END (Page 2) data viz tabPanel
+  ), # END (Page 2) MAPS stations tabPanel
 
   
   # (Page 3) data viz tabPanel ----
@@ -102,7 +102,6 @@ ui <- navbarPage(
              tabPanel(title = "Morphometrics",
 
                       tags$img(src = "wing_chord.jpg", width = 200, height = 150),  
-                      tags$img(src = "rbnu.jpg", width = 300, height = 150), 
                       tags$img(src = "olfl.jpg", width = 300, height = 150),
                       tags$img(src = "band_sizing.jpg", width = 300, height = 150),
                       
@@ -124,8 +123,8 @@ ui <- navbarPage(
                           # START species pickerInput ----
                           pickerInput(inputId = 'species_input',
                                       label = "Select species of interest:",
-                                      choices = c(unique(morphometrics$spec)),
-                                      selected = c("SWTH","AMRO"),
+                                      choices = c(unique(morphometrics$commonname)),
+                                      selected = c("Swainson's Thrush","American Robin"),
                                       options = pickerOptions(actionsBox = TRUE),
                                       multiple = TRUE),
 

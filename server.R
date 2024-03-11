@@ -12,7 +12,7 @@ server <- function(input, output) {
   # filter for species ----
   morphometrics_filtered_df <- reactive({
     morphometrics_filtered <- morphometrics %>% 
-      filter(spec == input$species_input)
+      filter(commonname == input$species_input)
     
     
     return(morphometrics_filtered)
@@ -49,12 +49,12 @@ server <- function(input, output) {
   output$wing_plot <- renderPlot({
   
   selected_species <- input$species_input
+
   
-  ggplot(morphometrics_filtered_df(), aes(x = wng, y = weight, color = spec)) +
+  ggplot(morphometrics_filtered_df(), aes(x = wng, y = weight, color = commonname)) +
     geom_point() +
     theme_bw() +
-    theme(legend.position = "none") +
-    labs(x = 'Wing chord (length in mm)', y = 'Body weight (g)') })
+    labs(x = 'Wing chord (length in mm)', y = 'Body weight (g)', color = 'Species')})
   
   
   # cover photo ----

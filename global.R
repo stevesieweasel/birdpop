@@ -66,6 +66,14 @@ morphometrics <- read_csv(here('data','wa_maps_banding.csv')) %>%
          'Age' = 'age') %>% 
   drop_na()
 
+alpha <- read_csv(here('data', 'bird_alpha.csv')) %>% 
+  clean_names() %>% 
+  select(spec, commonname, sciname)
+
+morphometrics <- left_join(morphometrics, alpha, by = 'spec') %>% 
+  drop_na(commonname)
+
+
 ## Reorder the levels of the Age and Breeding_Status factors
 morphometrics$Age <- factor(morphometrics$Age, levels = c("Nestling", 
                                                           "1st year", 

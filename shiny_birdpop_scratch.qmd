@@ -50,6 +50,12 @@ unique(effort$STATION)
 banded <- maps_banding %>% 
   drop_na(band)
 length(unique(banded$station))
+
+alpha <- read_csv(here('data', 'bird_alpha.csv')) %>% 
+  clean_names() %>% 
+  select(spec, commonname, sciname)
+
+morphometrics <- left_join(morphometrics, alpha, by = 'spec')
 ```
 
 ## Widget 1: Map of Sites
@@ -110,7 +116,12 @@ morphometrics <- maps_banding %>%
   mutate(f = as.factor(f)) %>% 
   drop_na()
 
-unique(morphometrics$spec)
+alpha <- read_csv(here('data', 'bird_alpha.csv')) %>% 
+  clean_names() %>% 
+  select(spec, commonname, sciname)
+
+morphometrics <- left_join(morphometrics, alpha, by = 'spec')
+
 ```
 ### Exploratory plots
 ```{r}
