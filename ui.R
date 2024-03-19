@@ -9,7 +9,7 @@ ui <- navbarPage(
    tags$link(rel = "stylesheet", type = "text/css", href = "sass-styles.css")
    ),
   
-  title = "Washington State MAPS Data Explorer",
+  title = "MAPS Bird Banding Data Explorer",
 
   # (Page 1) intro tabPanel ----
   tabPanel(title = "About this App",
@@ -17,12 +17,15 @@ ui <- navbarPage(
            fluidRow(
              # use columns to create white space on sides
              column(1),
-             column(10,           div(
+             column(5, div(
                id = "centered_bird_img_container",
                imageOutput("bird_img", width = "100%")
-             ),),
+             )),
+             column(5, div(
+               id = "centered_second_img_container",
+               imageOutput("bird_img2", width = "100%")
+             )),
              column(1)
-             
            ), # END intro image fluidRow
 
          # intro text fluidRow ----
@@ -53,13 +56,16 @@ ui <- navbarPage(
 
                           # stationspickerInput ----
                           sliderInput(inputId = "elev_input", label = "Select a range of elevations (meters)",
-                                      min = 3, max = 2100, value = c(3, 2100)), # END elevation pickerInput
+                                      min = 1, max = 7780, value = c(2200, 3200)), 
+                          # END elevation pickerInput
+                          
+                          includeMarkdown("text/map_page.md"),
 
                 ), # END station sidebarPanel
 
                         # station mainPanel ----
                         mainPanel(
-                          includeMarkdown("text/map_page.md"),
+
                           
                           # START Map fluidRow
                           fluidRow(
@@ -104,6 +110,10 @@ ui <- navbarPage(
                       tags$img(src = "wing_chord.jpg", width = 200, height = 150),  
                       tags$img(src = "olfl.jpg", width = 300, height = 150),
                       tags$img(src = "band_sizing.jpg", width = 300, height = 150),
+                      tags$img(src = "weighing.jpg", width = 300, height = 150),
+                      tags$img(src = "bado_band.jpg", width = 125, height = 150),
+                      tags$img(src = "ruhu.jpg", width = 250, height = 150),
+                      tags$img(src = "data.jpg", width = 125, height = 150),
                       
                       tags$div(style = "margin-top: 20px;"), # add some space
 
@@ -128,7 +138,8 @@ ui <- navbarPage(
                                       options = pickerOptions(actionsBox = TRUE),
                                       multiple = TRUE),
 
-
+                          
+                          includeMarkdown("text/morphometrics_page.md"),
                           
                           # END species pickerInput ----
                           
@@ -136,8 +147,7 @@ ui <- navbarPage(
                         
                         # morphometric mainPanel ----
                         mainPanel(
-                          
-                          includeMarkdown("text/morphometrics_page.md"),
+
                           
                           plotOutput(outputId = "morphometric_plot") %>% 
                             withSpinner(color = "#006792", type = 1),
@@ -155,5 +165,53 @@ ui <- navbarPage(
              
 
            
-  ) # END (Page 3) data viz tabPanel
+  ), # END (Page 3) data viz tabPanel
+  
+    # (Page 4) abundance model tabPanel ----
+  tabPanel(title = "Abundance Estimator",
+           
+
+             
+             # abundance model tabPanel ----
+             tabPanel(title = "Abundance Estimator",
+
+                      tags$div(style = "margin-top: 20px;"), # add some space
+
+                      # abundance model sidebarLayout ----
+                      sidebarLayout(
+                        
+                        # abundance model sidebarPanel ----
+                        sidebarPanel(
+                          
+
+                          # START species pickerInput ----
+                          pickerInput(inputId = 'abundance_species_input',
+                                      label = "Select species of interest:",
+                                      choices = c(unique(morphometrics$commonname)),
+                                      selected = "Swainson's Thrush",
+                                      options = pickerOptions(actionsBox = TRUE),
+                                      multiple = FALSE),
+                          
+                          includeMarkdown("text/abundance_model_page.md"),
+                          
+                          # END species pickerInput ----
+                          
+                        ), # END abundance model sidebarPanel
+                        
+                        # abundance model mainPanel ----
+                        mainPanel(
+                          
+                           plotOutput(outputId = "abundance_plot", height = '100vh') %>% 
+                            withSpinner(color = "#006792", type = 1),
+
+                          
+                        ) # END abundance model mainPanel
+                        
+                      ) # END abundance model sidebarLayout
+                      
+             ), # END abundance model tabPanel
+             
+
+           
+  ) # END (Page 4) abundance model tabPanel
 ) # END navbarPage

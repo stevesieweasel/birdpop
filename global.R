@@ -1,7 +1,5 @@
 # LOAD LIBRARIES ----
 library(shiny)
-library(lterdatasampler)
-library(palmerpenguins)
 library(tidyverse)
 library(shinyWidgets)
 library(markdown)
@@ -15,6 +13,8 @@ library(leaflet)
 library(fresh)
 library(shinycssloaders)
 library(sass)
+library(Rcapture)
+library(msm)
 
 # DATA WRANGLING ----
 ## Station info ----
@@ -44,7 +44,7 @@ center_lat <- median(stations$lat)
 # Wrangling raw banding data into tidy df of useful morphometrics
 morphometrics <- read_csv(here('data','wa_maps_banding.csv')) %>% 
   clean_names() %>% 
-  select(spec, age, sex, f, fw, wng, weight, brstat) %>% 
+  select(date, band, spec, age, sex, f, fw, wng, weight, brstat) %>% 
   filter(weight != 0, wng != 0, age != 0, brstat != '?') %>%
   mutate(age = ifelse(age == 4, "Nestling",
                ifelse(age == 2, "1st year",
@@ -71,7 +71,8 @@ alpha <- read_csv(here('data', 'bird_alpha.csv')) %>%
   select(spec, commonname, sciname)
 
 morphometrics <- left_join(morphometrics, alpha, by = 'spec') %>% 
-  drop_na(commonname)
+  drop_na(commonname) %>% 
+  mutate(year = year(date))
 
 
 ## Reorder the levels of the Age and Breeding_Status factors
