@@ -13,21 +13,10 @@ ui <- navbarPage(
 
   # (Page 1) intro tabPanel ----
   tabPanel(title = "About this App",
-           # intro image fluidRow ----
-           fluidRow(
-             # use columns to create white space on sides
-             column(1),
-             column(5, div(
-               id = "centered_bird_img_container",
-               imageOutput("bird_img", width = "100%")
-             )),
-             column(5, div(
-               id = "centered_second_img_container",
-               imageOutput("bird_img2", width = "100%")
-             )),
-             column(1)
-           ), # END intro image fluidRow
-
+           tags$img(src = "rbnu.jpg", width = 1000, height = 400), 
+           tags$img(src = "rbnu2.jpg", width = 300, height = 400), 
+           
+          
          # intro text fluidRow ----
          fluidRow(
            # use columns to create white space on sides
@@ -107,13 +96,12 @@ ui <- navbarPage(
              # morphometrics tabPanel ----
              tabPanel(title = "Morphometrics",
 
-                      tags$img(src = "wing_chord.jpg", width = 200, height = 150),  
                       tags$img(src = "olfl.jpg", width = 300, height = 150),
-                      tags$img(src = "band_sizing.jpg", width = 300, height = 150),
                       tags$img(src = "weighing.jpg", width = 300, height = 150),
+                      tags$img(src = "wing_chord.jpg", width = 200, height = 150),  
+                      tags$img(src = "band_sizing.jpg", width = 300, height = 150),
                       tags$img(src = "bado_band.jpg", width = 125, height = 150),
-                      tags$img(src = "ruhu.jpg", width = 250, height = 150),
-                      tags$img(src = "data.jpg", width = 125, height = 150),
+                      tags$img(src = "ruhu.jpg", width = 225, height = 150),
                       
                       tags$div(style = "margin-top: 20px;"), # add some space
 
